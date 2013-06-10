@@ -1,0 +1,13 @@
+Package: mURL
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: alex
+Version: 1.0
+License: GPL-3
+Title: 
+Description: 
+Suggests:
+    testthat,
+    roxygen2
+Collate:
+    'mURL-package.r'
+    'multi.R'
