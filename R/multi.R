@@ -29,6 +29,7 @@ makeUrlWorker <- function(murl,session)observe({
         cat(file=stderr(),"completed download of a url\n")
 
 				# decode content when complete.  this triggers the next step (consumer)
+        # note - content may already be decoded by the response funciton - let's check
 				fetcher$content <- content(as="text",isolate(fetcher$deferred_httr$response()))
 				pop(murl$multiHandle, isolate(fetcher$deferred_httr$curl))
 			
