@@ -57,7 +57,7 @@ makeUrlWorker <- function(murl,session)observe({
 	murl$lastStartedCount <<- isolate(murl$startedCount)
 	
 	if (status$numHandlesRemaining > 0) {
-		invalidateLater(1,session)
+		invalidateLater(10,session)
 		# libcurl knows when curlhandles are complete, but that property is not exported
 		# this code uses the contentlength to detect completeness
 	} else {
