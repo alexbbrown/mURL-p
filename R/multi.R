@@ -14,7 +14,12 @@ makeUrlWorker <- function(murl,session)observe({
 	
 	# do one more unit of work.  Can we get it to do an intermediate amount of work?
 	# may want to globally adjust buffer sizes
-	status <- curlMultiPerform(murl$multiHandle, multiple = FALSE)
+	# let's do at least .1 seconds of work
+	startTime <- now()
+	while(difftime(now(),startTime,units="secs") < .2) {
+		status <- curlMultiPerform(murl$multiHandle, multiple = FALSE)
+		if (status$numHandlesRemaining == 0) break
+  }
 
   # scan for completed handles.  Ideally should rely on curl multi info api
   # but it's not currently exposed through rcurl.  instead check that download size
