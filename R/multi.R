@@ -41,7 +41,7 @@ makeUrlWorker <- function(murl,session)observe({
         # note - content may already be decoded by the response funciton - let's check
 				response <- fetcher$deferred_httr$response()
 				if (is(response, "response")) {
-					fetcher$content <- content(as="text",isolate(response))
+					fetcher$content <- content(as="text",response)
 				} else {
 					fetcher$content <- response 
 				}
