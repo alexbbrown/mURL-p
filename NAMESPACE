@@ -1,3 +1,4 @@
 export(new_multi_controller)
+export(queue_deferred)
 export(queue_download)
 export(simpleStatus)

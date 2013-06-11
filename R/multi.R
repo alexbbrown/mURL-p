@@ -22,6 +22,7 @@ makeUrlWorker <- function(murl,session)observe({
 	if (status$numHandlesRemaining != isolate(murl$lastHandlesRemaining) ||
 	  murl$startedCount != murl$lastStartedCount) {
 			
+			
 		murl$fetchers <- Filter(function(fetcher){
 			complete <- with(simpleStatus(isolate(fetcher$deferred_httr$curl)),size.download==content.length.download)
 		
@@ -30,7 +31,12 @@ makeUrlWorker <- function(murl,session)observe({
 
 				# decode content when complete.  this triggers the next step (consumer)
         # note - content may already be decoded by the response funciton - let's check
-				fetcher$content <- content(as="text",isolate(fetcher$deferred_httr$response()))
+				response <- fetcher$deferred_httr$response()
+				if (is(response, "response")) {
+					fetcher$content <- content(as="text",isolate(response))
+				} else {
+					fetcher$content <- response 
+				}
 				pop(murl$multiHandle, isolate(fetcher$deferred_httr$curl))
 			
 				murl$completed <<- c(murl$completed, list(fetcher))
@@ -91,6 +97,19 @@ new_multi_controller <- function(session){
 #' @export
 queue_download <- function(url, murl) {
 	deferred_httr <- GET_deferred(url)
+	queue_deferred(deferred_httr,url,murl)
+}
+
+#' Tell the multi controller to start a new url for download
+#' @param deferred_httr the deferred httr request
+#' @param url that is requested or a descriptive name
+#' @param murl the multi url controller
+#' @return a wrapper around a deferred http handle.
+#'
+#' more documentation required.
+#'
+#' @export
+queue_deferred <- function(deferred_httr, url, murl) {
 	new_fetcher <- new.fetcher(url)
 	new_fetcher$deferred_httr <- deferred_httr
 
