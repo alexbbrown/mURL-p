@@ -29,8 +29,11 @@ makeUrlWorker <- function(murl,session)observe({
 			
 			
 		murl$fetchers <- Filter(function(fetcher){
-			complete <- with(simpleStatus(isolate(fetcher$deferred_httr$curl)),size.download==content.length.download)
-		
+			status <- simpleStatus(isolate(fetcher$deferred_httr$curl))
+			completeSize <- status$content.length.download
+			if (!is.null(fetcher$size)) completeSize<-fetcher$size
+			complete <- completeSize==status$size.download
+
 			if (complete) {
         cat(file=stderr(),"completed download of a url\n")
 
