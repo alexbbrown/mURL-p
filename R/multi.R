@@ -32,19 +32,25 @@ makeUrlWorker <- function(murl,session)observe({
 			status <- simpleStatus(isolate(fetcher$deferred_httr$curl))
 			completeSize <- status$content.length.download
 			if (!is.null(fetcher$size)) completeSize<-fetcher$size
-			complete <- completeSize==status$size.download
+			complete <- completeSize==status$size.download | status$response.code >= 400
 
 			if (complete) {
-        cat(file=stderr(),"completed download of a url\n")
-
-				# decode content when complete.  this triggers the next step (consumer)
-        # note - content may already be decoded by the response funciton - let's check
-				response <- fetcher$deferred_httr$response()
-				if (is(response, "response")) {
-					fetcher$content <- content(as="text",response)
+				if (status$response.code >= 400) {
+					cat(file=stderr(),"failed to download url: ", status$effective.url, " ", fetcher$opts$url, "\n")
+					fetcher$content <- NULL
 				} else {
-					fetcher$content <- response 
+        	cat(file=stderr(),"completed download of url: ", status$effective.url, " ", fetcher$opts$url, "\n")
+					# decode content when complete.  this triggers the next step (consumer)
+	        # note - content may already be decoded by the response function - let's check
+	        # embedded nulls when decoding can be a problem.
+					response <- fetcher$deferred_httr$response()
+					if (is(response, "response")) {
+						fetcher$content <- content(as="text",response)
+					} else {
+						fetcher$content <- response 
+					}
 				}
+				
 				pop(murl$multiHandle, isolate(fetcher$deferred_httr$curl))
 			
 				murl$completed <<- c(murl$completed, list(fetcher))
