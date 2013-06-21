@@ -1,3 +1,6 @@
+#'exported
+print.reactivevalues=function(x)isolate(print(names(x)))
+
 #' build an worker for parallel downloads
 #'
 #' URLworker is concerned with the continuing fetch work of the multi
